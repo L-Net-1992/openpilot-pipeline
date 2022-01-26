@@ -208,7 +208,7 @@ def train(model, train_loader, val_loader, optimizer, scheduler, recurr_warmup, 
 
             timings = dict()
             running_loss = 0.0
-            # tr_logger.plotTr( running_loss /100, optimizer.param_groups[0]['lr'], time.time() - start_point )  # add get current learning rate adjusted by the scheduler.
+            tr_logger.plotTr( running_loss /100, optimizer.param_groups[0]['lr'], time.time() - start_point )  # add get current learning rate adjusted by the scheduler.
 
         if (tr_it + 1) % val_frequency_steps == 0:
             val_loss, val_time = validate(model, val_loader, batch_size, device, train_segment_for_viz, val_segment_for_viz)
@@ -223,7 +223,7 @@ def train(model, train_loader, val_loader, optimizer, scheduler, recurr_warmup, 
             torch.save(model.state_dict(), checkpoint_save_path)
             model.train()
 
-            # val_logger.plotTr(val_loss, optimizer.param_groups[0]['lr'], val_time)
+            val_logger.plotTr(val_loss, optimizer.param_groups[0]['lr'], val_time)
 
         batch_load_start = time.time()
 
@@ -231,7 +231,7 @@ def train(model, train_loader, val_loader, optimizer, scheduler, recurr_warmup, 
     printf(f"Epoch {epoch+1} done! Took {pprint_seconds(time.time() - start_point)}")
     printf()
 
-    # tr_logger.plotTr(running_loss/(tr_it+1), optimizer.param_groups[0]['lr'], time.time() - start_point )
+    tr_logger.plotTr(running_loss/(tr_it+1), optimizer.param_groups[0]['lr'], time.time() - start_point )
 
     return recurr_input
 
@@ -301,8 +301,8 @@ def validate(model, data_loader, batch_size, device, train_segment_for_viz, val_
                 video_pred_log_title = "pred_video_valset"
                 video_gt_log_title = "gt_video_valset"
 
-            # wandb.log({video_pred_log_title: wandb.Video(video_array_pred, fps = 20, format= 'mp4')})
-            # wandb.log({video_gt_log_title: wandb.Video(video_array_gt, fps = 20, format= 'mp4')})
+            wandb.log({video_pred_log_title: wandb.Video(video_array_pred, fps = 20, format= 'mp4')})
+            wandb.log({video_gt_log_title: wandb.Video(video_array_gt, fps = 20, format= 'mp4')})
 
             del video_array_pred
             del video_array_gt
@@ -516,7 +516,7 @@ if __name__ == "__main__":
     val_logger = WandbLogger("validation")
 
     # wandb init
-    # run = wandb.init(project="test-project", entity="openpilot_project", train_run_name = train_run_name, reinit= True, tags= ["supercombbo pretrain"])
+    run = wandb.init(project="test-project", entity="openpilot_project", train_run_name = train_run_name, reinit= True, tags= ["supercombbo pretrain"])
 
     # Load data and split in test and train
     printf("=>Loading data")
@@ -548,7 +548,7 @@ if __name__ == "__main__":
     comma_model = load_model(path_to_supercombo, trainable_layers=pathplan_layer_names)
     comma_model = comma_model.to(device)
 
-    # wandb.watch(comma_model) # Log the network weight histograms
+    wandb.watch(comma_model) # Log the network weight histograms
     
     
 
